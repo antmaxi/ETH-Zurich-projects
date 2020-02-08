@@ -1,0 +1,5 @@
+%%%%%%%%%% USE FOLLOWING LINES OF CODE TO FIX ORIENTATION OF CAMERAS %%%%%%%%%%
+% if (det(Ps{3}) < 0 )
+%     Ps{3}(1:3,1:3) = -Ps{3}(1:3,1:3);
+%     Ps{3}(1:3, 4) = -Ps{3}(1:3, 4);
+% end
