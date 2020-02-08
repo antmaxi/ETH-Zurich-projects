@@ -1,0 +1,30 @@
+% Input
+% Image X - Lx3
+% alpha Kx1
+% mu - 3xK
+% var - 3x3xK
+%%%%%%%%%%%%%%%%
+% Output
+% P - LxK
+function P = expectation(mu,var,alpha,X)
+
+K = length(alpha);
+% number of pixels
+L = size(X,1);
+P = zeros(L, K);
+for i = 1:L
+    % Normalization constant
+    Z = 0;     
+    for j = 1:K
+    % pdf of multivariate Gaussian
+        r = chol(var(:,:,j));
+        P(i,j) = alpha(j)*(2*pi)^(-3/2)*exp(-0.5
+        P(i,j) = alpha(j)*(2*pi)^(-3/2)*exp(-sumsqr((X(i,:)'-mu(:,j))./r,2)/2) / prod(diag(r));
+        disp(P(i,j));
+        P(i,j) = alpha(j)*mvnpdf(X(i,:)',mu(:,j),var(:,:,j));
+        disp(P(i,j));
+        Z = Z + P(i,j);
+    end
+    P(i, :) = P(i, :)/Z;
+end
+end
