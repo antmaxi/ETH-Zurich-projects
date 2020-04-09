@@ -37,6 +37,7 @@ The objective is to compute a set S⊆V of vertices such that (1) the subgraph G
 Devise a deterministic distributed algorithm that computes such a set S in f(Δ)+O(log∗n) rounds, for the smallest function f(Δ) that you can find. Each computer should know whether it's node is in S or not.
 
 **4. Marking vertices**
+
 Suppose somebody gives you a deterministic distributed graph algorithm that for any given graph G marks some subset S of its vertices in such a way that no two marked vertices are connected by an edge and for any vertex v∈G there is a marked vertex s∈S such that the distance of v and s is at most 100. 
 
 Prove that there is a network graph with n nodes where the round complexity of such an algorithm must be at least Ω(log∗n).
