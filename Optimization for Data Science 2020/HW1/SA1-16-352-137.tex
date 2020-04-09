@@ -1,0 +1,127 @@
+\documentclass[]{article}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+%\maketitle
+Legi 16-352-137\\ 
+\textbf{Separating Hyperplane of Data Points}
+\begin{enumerate}
+	\item We need to prove (definition of subgradient)
+	$$g(y) \ge g(x) + \nabla g_{k(x)}^\top(y-x), \forall x,y\in \mathcal{R}^d.$$
+	But $g(x) = g_{k(x)}(y),\;\; g(y) = \max_{i\in[m]}g_i(y) \ge g_{k(x)}(y)$ and from convexity and differentiability of $g_{k(x)}$ we have 
+	$$g_{k(x)}(y) \ge g_{k(x)}(x) + \nabla g_{k(x)}^\top(y-x), \forall x,y\in \mathcal{R}^d,$$ and it's true only for one such value of $\nabla g_{k(x)}^\top(y-x)$ (differentiability), so
+	$$g(y)\ge g_{k(x)}(y) \ge g_{k(x)}(x) + \nabla g_{k(x)}^\top(y-x)=g(x) + \nabla g_{k(x)}^\top(y-x), \forall x,y\in \mathcal{R}^dd$$ and therefore $\nabla g_{k(x)}^\top(y-x)$ is subragient in $x$$\qed$.
+	
+	Then, using this (because $g_i(x)$ now are $-y_i\mathbf{w}^\top\mathbf{x_i}$ --- differentiable and convex (because linear)), we can claim that in any point $x$ subgradient of $f(\mathbf{w})$ is $\nabla_{\mathbf{w}}(-y_i\mathbf{w}^\top\mathbf{x_i})=-y_i\mathbf{x_i}$ where $i$ is such that $-y_i\mathbf{w}^\top\mathbf{x_i}$ is maximal among all $i\in [m]$ (which indicates the worst classified point in the set (a we want it to be as less as possible, and in the end less than $0$ for all $i$)).
+	\item From Exercise 24 we get that because $dom(f)$ is convex (the whole space is convex obviously) and there exist subgradient in every point (calculated in previous subtask), then $f$ is convex. Also from the previous subtask we have that 
+	$\partial f(\mathbf{w}) = -y_i\mathbf{x_i}$ for some $i$. And $||-y_i\mathbf{x_i}|| = ||y_i||\cdot||\mathbf{x_i}||=1\cdot||\mathbf{x_i}||\le\max_{i\in [m]}||\mathbf{x_i}|| = B$.
+	From Lemma 4.4 (Exercise 25) we have that the last result is equivalent to $B$--Lipschitzness.
+	\item $y_i\mathbf{w}^\top\mathbf{x_i}\ge 1 \Rightarrow y_i\mathbf{w}^\top\mathbf{x_i}\le -1$. Suppose $a \coloneqq \min y_i\mathbf{w}^\top\mathbf{x_i} < -1$, then if we change $\mathbf{w}\rightarrow\frac{\mathbf{w}}{|a|}$, we will still have $y_i\mathbf{w}^\top\mathbf{x_i} \le -1$ (all values shrinked no more than in $|a|$ times, and the smallest absolute value became 1), therefore still $-y_i\mathbf{w}^\top\mathbf{x_i} \ge 1$. But now the norm of $\mathbf{w}$ shrinked in $|a|>1$ times, what is in contradiction with task and therefore proves the claim.
+	
+	\item As the set is linearly separable there exist at least one $\mathbf{w^*}\ne\mathbf{0}$ such that $f(\mathbf{w_*}) <0$.\\
+	We start from $\mathbf{w_0}=\mathbf{0}$ and do this at $k$--th step ($k$ starts from $0$):
+	$$\mathbf{w_{k+1}} = \mathbf{w_k} + \mathbf{g}(\mathbf{w_k}), \:\; \mathbf{g}(\mathbf{w_k}) \text{ --- subgradient of $f(\mathbf{w})$ as in 1. subtask}$$
+	until $\mathbf{w_{k+1}}^\top\mathbf{g}(\mathbf{w_{k+1})}<0$ (which means all points are classified correctly). 
+	We know from subtask 1 that
+	$$\mathbf{g}(\mathbf{w_k})=-y_i\mathbf{x_i},\; i=\arg\max_{j\in [m]} -y_j\mathbf{w_k}\mathbf{x_j}.$$
+	Let's prove that this algorithm converges to the solution.\\
+	After $k$ steps we will have (obviously from recursion)
+	\begin{equation}
+	\label{eq}
+	\mathbf{w_{k+1}} = \sum_{j=0}^{k}\mathbf{g}(\mathbf{w_j})=\sum_{j=0}^{k} -y_i\mathbf{x_i}, \; \text{all $i\in [m]$ and could be repeated in principle.}
+	\end{equation}
+	Let's denote $A=\min_{j\in [m]}\frac{|\mathbf{w_*^\top} \mathbf{x_j}|}{||\mathbf{w_*}||}>0$ (as it separates the points). Note that it doesn't on scale of $\mathbf{w_*}$.\\
+	Then multiplying (\ref{eq}) by $\mathbf{w_*^\top}$ from left in both sides we have
+	$$\mathbf{w_*^\top}\mathbf{w_{k+1}} = \sum_{j=0}^{k} \mathbf{w_*^\top}\mathbf{g}(\mathbf{w_j})\ge (k+1)A||\mathbf{w_*}||.$$
+	Therefore from Cauchy-Schwarz inequality we have lower--bound
+	\begin{equation}
+	\label{low}
+	||\mathbf{w_*}||^2||\mathbf{w_{k+1}}||^2 \ge (k+1)^2A^2||\mathbf{w_*}||^2 \Rightarrow ||\mathbf{w_{k+1}}||^2 \ge (k+1)^2A^2
+	\end{equation}
+	
+	We will further establish also upper--bound
+	$$ \mathbf{w_{k+1}}=\mathbf{w_{k}}+\mathbf{g_{k}},$$
+	taking square Euclidean norm we have
+	$$||\mathbf{w_{k+1}}||^2=||\mathbf{w_{k}}||^2+2\mathbf{w_{k}}^\top\mathbf{g_{k}}+||\mathbf{g_{k}}||^2$$
+	Assuming that the algorithm isn't finished yet (it's the main assumption we have and which we will have to end at some point as we will see in (\ref{squeeze})) we have $\mathbf{w_{k}}^\top\mathbf{g}(\mathbf{w_{k})}\ge0$, therefore
+	$$
+	||\mathbf{w_{k+1}}||^2\le||\mathbf{w_{k}}||^2+||\mathbf{g_{k}}||^2$$
+	and therefore
+	$$
+	||\mathbf{w_{j+1}}||^2-||\mathbf{w_{j}}||^2\le||\mathbf{g_{j}}||^2, \;\forall j\in 0,\ldots, k$$
+	Then summing telescopically for $k$ from $0$ to final $k$ we have (using $\mathbf{w_{0}}=\mathbf{{0}})$
+	$$||\mathbf{w_{k+1}}||^2\le\sum_{i=0}^k||\mathbf{g_{i}}||^2$$
+	As the set of points is finite, then exist $B=\max_{i\in [m]}||\mathbf{x_i}||\ge\max_{i\in [m]}||\mathbf{g(w)}|| \forall \mathbf{w}.$ Then we have upper--bound (we could have also obtained it straightly from the subtask 2 using $B$--Lipschitzness)
+	\begin{equation}
+	\label{up}
+	||\mathbf{w_{k+1}}||^2\le(k+1)B
+	\end{equation}
+	Combining (\ref{low}) and (\ref{up}) we have 
+	\begin{equation}
+	\label{squeeze}
+	(k+1)^2A^2\le ||\mathbf{w_{k+1}}||^2\le (k+1)B 
+	\end{equation}
+	which means that after 
+	\begin{equation}
+	\label{k}
+K=\ceil{\frac{B}{A^2} - 1}
+	\end{equation} our assumption that algorithm hasn't finished should be violated (lower bound higher than upper) and it will stop obtaining needed $\mathbf{w}$.
+	
+	\item As we have seen in subtask 6 after no more than $K$ iterations from (\ref{k}) we will finish. At each iteration $k$ we need\\
+	
+	 to obtain $\arg\max_{j\in [m]} -y_j\mathbf{w_k}\mathbf{x_j}$ (which is $O(nm)$, as inner product in $\mathcal{R}^n$ costs $O(n)$ and we need to repeat it for at most $O(m)$ points),\\
+	 
+	  check that $\max_{j\in [m]} -y_j\mathbf{w_k}\mathbf{x_j} \ge 0$ ($O(1)$), 
+	  
+	  therefore overall we need no more that $O(\frac{nmB}{A^2})$ elementary operations.
+	  Constants $A$ and $B$ are determined as
+	  $$A=\min_{j\in [m]}\frac{|\mathbf{w_*^\top} \mathbf{x_j}|}{||\mathbf{w_*}||}, \;B=\max_{i\in [m]}||\mathbf{x_i}||.$$
+	  %If needed, lower bound on $A$ could be estimated from data as 
+
+
+	\textbf{Accelerated Gradient Descent for Strongly Convex Functions}
+	\item From the Theorem 2.8 from lectures (its conditions are satisfied from the task description) we have (because $z_0 \coloneqq x_0$)
+	\begin{equation}
+	\label{1}
+	\frac{2L||z_0-x^*||^2}{T(T+1)}=\frac{2LR^2}{T(T+1)}\ge f(y_T)-f(x^*).
+	\end{equation}
+	From strong convexity 
+	$$
+	f(y) \ge f(x) + \nabla f(x) (y-x) + \frac{\mu}{2}||y-x||^2.$$ for $y=y_T$ and $x=x^*$ we have (as $\nabla f(x^*)=0$ in global minimum of differentiable convex function determined in the whole $\mathcal{R}^n$):
+	\begin{equation}
+	\label{2}
+	f(y_T)-f(x^*)\ge \frac{\mu}{2}||y_T-x^*||^2
+	\end{equation}
+	which together with (\ref{1}) gives
+	\begin{equation}
+	\label{3}
+	\frac{2LR^2}{T(T+1)}\ge f(y_T)-f(x^*)\ge\frac{\mu}{2}||y_T-x^*||^2.
+	\end{equation}
+	After regrouping it leads to
+	\begin{equation}
+	\label{3}
+	\frac{||y_T-x^*||^2}{R^2}\le
+	\frac{4L}{\mu T(T+1)}.
+	\end{equation}
+	It means that after $T$ such that $\frac{4L}{\mu T(T+1)}\le0.5$ we can choose $y_T$ as $x$ and have needed condition of twice decreasing of the square of distance to the solution. Therefore, we need $T(T+1)\ge \frac{8L}{\mu}$, but $T(T+1) \ge T^2$ as $T$ is non-negative number, then it's sufficient to choose $$T=\ceil{\sqrt{\frac{8L}{\mu}}}$$
+	which is obviously $O(\sqrt{\frac{L}{\mu}})$ as needed.
+	\item From smoothness definition
+	$$f(y) \le f(x) + \nabla f(x) (y-x) + \frac{L}{2}||y-x||^2$$
+	using $x=x^*$ (which means $\nabla f(x^*)=0$ as in previous) and $y=x_T$ we have
+	$$f(x_T)-f(x^*)\le\frac{L}{2}||x^*-x_T||^2$$
+	We need $f(x_T)-f(x^*)\le\varepsilon$, therefore it's enough to make $$\frac{L}{2}||x^*-x_T||^2\le\varepsilon$$ i.e. $$||x^*-x_T||^2\le\frac{2\varepsilon}{L}.$$
+	From Assignment 6 we know that we can make $||x^*-x_T||^2$ decrease twice in $O(\sqrt{\frac{L}{\mu}})$ iterations. If we now repeat the process from the previous subtask starting it anew several times, we need the square of distance $R^2$ to decrease at least $\frac{R^2L}{2\varepsilon}$ times by decreasing it at least twice per step, which will be done in at most $$\ceil{\sqrt{\frac{8L}{\mu}}}\log_2 \frac{R^2L}{2\varepsilon} $$ which is $$O(\sqrt{\frac{L}{\mu}}\ln(\frac{R^2L}{2\varepsilon}))$$
+	as needed.
+\end{enumerate}
+
+
+
+\end{document}
