@@ -1,16 +1,5 @@
-# Physically-based Simulation 2019 - Course Exercises
+# Physically-based Simulation 2019
 
-## Exercise Overview
-
-[Exercise 1: Time Integration](ex1.pdf)
-
-[Exercise 2: Rigid Body Rotation](ex2.pdf)
-
-[Exercise 3: Collision Handling](ex3.pdf)
-
-[Exercise 4: Mass-Spring System](ex4.pdf)
-
-[Exercise 5: Fluid Simulation](ex5.pdf)
 
 ## Installation
 
