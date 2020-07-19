@@ -6,6 +6,6 @@
 
 **Physically-based simulation project** (Autumn 2019) --- floating boat using particle-based SPH fluid simulation - *obtained 6.0 https://gitlab.ethz.ch/plojmand/physitproject/tree/master/src/Course_framework*
 
-**Principles of Distributed Computing** (Spring 2020) --- 2 graded homeworks, grades 6.0 and ...
+**Principles of Distributed Computing** (Spring 2020) --- 2 graded homeworks, grades 6.0 and 5.0
 
-**Optimization for Data Science** (Spring 2020) --- 2 graded homeworks, grades ... and ...
+**Optimization for Data Science** (Spring 2020) --- 2 graded homeworks, grades 5.55 and 5.5
