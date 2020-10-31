@@ -1,0 +1,81 @@
+def test():    
+    PC = PairwiseClustering()
+    X = protein["dissimilarity"]
+    N = np.shape(X)[0]
+    K = PC.n_clusters
+    d = PC.n_components
+    y = np.random.rand(K, d)
+    x_emb = np.random.rand(N, d)
+    x_emb_prev = x_emb.copy()
+    # Get Eps_star
+    _ = PC.fit_predict(X, embed=False)
+    T_curr = PC.T
+    M_av_prev = PC.M_av
+    Eps_star = PC.Eps_star
+    while T_curr > PC.T_f:
+        t = 0
+        while True:            
+            # E-step (7) [here]
+            # Create matrix N x K of distances between x_i and y_\nu
+            dist = np.empty((N,K))
+            for i in range(N):
+                for j in range(K):
+                    dist[i][j] =  np.linalg.norm(x_emb[i,:] - y[j,:])**2
+                    # (matrix trial)
+                    #x_rep = np.matlib.repmat(x_emb, K, 1)  # NK x d
+                    #y_rep = np.matlib.repmat(y, N, 1)  # NK x d           
+                    #dist = np.linalg.norm(x_rep - y_rep, axis=1)**2
+                    #dist = np.reshape(dist, (N,K))  # N x K
+            # Estimate M
+            M_av = np.exp(-dist/T_curr - np.matlib.repmat(
+                            sp.special.logsumexp(-dist/T_curr, axis=1), # 1xN
+                            K, 1).transpose()) # N x K
+            # M-step
+            # Complex function and small dimensions, so we use loops further
+            # instead of more efficient matrix calculations if they are hard to implement
+            t_emb = 0
+            while True:    
+                # x_emb update (33) in [1], (5) [here]
+                y_av = (M_av @ y).transpose()  # d x N
+                #print(y_av)
+                y_cov = np.empty((d,d,N))
+                # Get <y>_i<y>_i^T
+                for i in range(N):
+                    y_cov[:,:,i] = np.outer(y_av[:,i], y_av[:,i])  # d x d x N
+                # Get <yy^T>_i    
+                yy_av = np.zeros((d,d,N))
+                for i in range(N):
+                    #print(np.shape(np.multiply(
+                    #    np.matlib.repmat(M_av[i, :], d, 1), y.transpose())))
+                    yy_av[:,:,i] = np.dot(np.multiply(
+                        np.matlib.repmat(M_av[i, :], d, 1), y.transpose()), y) # d x d
+                # M_av_3 = np.repeat(M_av[:, :, np.newaxis], d, axis=2)
+                K_i = yy_av - y_cov  # d x d
+                for i in range(N):
+                    x_emb[i,:] = 0.5 * np.linalg.inv(K_i[:,:,i]) \
+                        @ (M_av[i,:] * (np.linalg.norm(y)**2 - Eps_star[i,:]) \
+                        @ (y - y_av[:,i].transpose()))
+                    #print(np.linalg.inv(K_i[:,:,i]))
+                    #print((np.linalg.norm(y)**2 - Eps_star[i,:]))
+                    #print((y - y_av[:,i].transpose()))
+                    if i == -1:
+                        return 0
+                print(x_emb[0])
+                print(x_emb_prev[0])
+                # centroid (6) [here]
+                y = M_av.transpose() @ x_emb / np.matlib.repmat(
+                                    np.sum(M_av, axis=0), d, 1).transpose()
+                if not np.any(np.abs(x_emb_prev - x_emb) > PC.eps_embed):
+                    break
+                x_emb_prev = x_emb.copy()
+                t_emb += 1
+                print(t_emb)
+            if not np.any(np.abs(M_av_prev - M_av) > PC.eps):
+                break
+            M_av_prev = M_av.copy()
+            print(t)
+            t += 1
+        T_curr *= PC.rate    
+    PC.x_emb = x_emb
+    return 0
+test()
